@@ -1,28 +1,41 @@
-import { IBuyer } from "../../../types";
-import type { TPayment } from "../../../types";
+import { IBuyer } from "../../types";
+import type { TPayment } from "../../types";
 
-export class Buyer {
-  private payment: TPayment;
-  private email: string;
-  private phone: string;
-  private address: string;
+type ValidationField = { //тип для 1 поля
+    valid: boolean;
+    error?: string
+  };
 
-  constructor(data: IBuyer) {
-    this.payment = data.payment;
-    this.email = data.email;
-    this.phone = data.phone;
-    this.address = data.address;
+  type ValidationResult = {
+    payment: ValidationField;
+    email: ValidationField;
+    phone: ValidationField;
+    address: ValidationField;
   }
 
-  setData(data: Partial<IBuyer>) {
+export class Buyer {
+  private payment: TPayment = "";
+  private email: string = "";
+  private phone: string = "";
+  private address: string = "";
+
+  constructor() {}
+
+  setData(data: Partial<IBuyer>):void {
     if (data.payment !== undefined) this.payment = data.payment;
     if (data.email !== undefined) this.email = data.email;
     if (data.phone !== undefined) this.phone = data.phone;
     if (data.address !== undefined) this.address = data.address;
   }
 
-  validate() {
-    const result: any = {}; //валидация данных
+  validate(): ValidationResult {
+    const result: ValidationResult = {
+    payment: {valid: true},
+    email: {valid: true},
+    phone: {valid: true},
+    address: {valid: true}
+
+    }; //валидация данных
 
     if (this.payment) {
       result.payment = { valid: true };
@@ -51,7 +64,7 @@ export class Buyer {
     return result;
   }
 
-  get(): IBuyer {
+  getBuyer(): IBuyer {
     //получение данных
     return {
       payment: this.payment,
@@ -61,14 +74,10 @@ export class Buyer {
     };
   }
 
-  save() {
-    //сохранение данные
-    localStorage.setItem("buyer", JSON.stringify(this.get()));
-  }
-
-  clearBuyerData() {
+  save(): void {}
+  
+  clearBuyerData():void {
     //очистка данных получателя
-    localStorage.removeItem("buyer");
     this.payment = "";
     this.email = "";
     this.phone = "";

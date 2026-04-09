@@ -1,12 +1,12 @@
-import { IProduct } from "../../../types";
+import { IProduct } from "../../types";
 
 export class ProductCatalog {
   private products: IProduct[];
   private selectedCard: IProduct | null;
 
-  constructor(products: IProduct[], selectedCard: IProduct | null) {
-    this.products = products;
-    this.selectedCard = selectedCard;
+  constructor() {
+    this.products = [];
+    this.selectedCard = null;
   }
 
   getProducts(): IProduct[] {

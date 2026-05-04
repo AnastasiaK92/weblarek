@@ -1,7 +1,10 @@
 import { IProduct } from "../../types";
+import { EventEmitter } from "../base/Events";
 
 export class ShoppingCart {
   private products: IProduct[];
+
+  public events = new EventEmitter();
 
   constructor(products: IProduct[]) {
     this.products = products;
@@ -10,11 +13,13 @@ export class ShoppingCart {
   addProduct(product: IProduct): void {
     //добавить товар
     this.products.push(product);
+    this.events.emit("cart:changed", this.getProducts());
   }
 
   removeProduct(id: string): void {
     //удалить товар
     this.products = this.products.filter((p) => p.id !== id);
+    this.events.emit("cart:changed", this.getProducts());
   }
 
   getProductCount(): number {
@@ -47,5 +52,6 @@ export class ShoppingCart {
   clearCart(): void {
     //очищение корзины
     this.products = [];
+    this.events.emit("cart:changed", this.getProducts());
   }
 }

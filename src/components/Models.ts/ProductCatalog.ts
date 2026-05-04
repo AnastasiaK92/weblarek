@@ -1,8 +1,11 @@
 import { IProduct } from "../../types";
+import { EventEmitter } from "../base/Events";
 
 export class ProductCatalog {
   private products: IProduct[];
   private selectedCard: IProduct | null;
+
+  public events = new EventEmitter();
 
   constructor() {
     this.products = [];
@@ -22,6 +25,7 @@ export class ProductCatalog {
   setSelectedProduct(selectedCard: IProduct): void {
     //сохранить выбранную карточку
     this.selectedCard = selectedCard;
+    this.events.emit("product:selected", selectedCard);
   }
 
   getSelectedProduct(): IProduct | null {
@@ -32,5 +36,6 @@ export class ProductCatalog {
   setProducts(products: IProduct[]): void {
     //сохранить массив товаров
     this.products = products;
+    this.events.emit("products:changed", this.products);
   }
 }

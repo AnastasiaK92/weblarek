@@ -14,7 +14,7 @@ export class ShopApi {
     return this.api.get("/product/");
   }
 
-  createOrder(order: IOrder):Promise<IOrderResponse> {
-    return this.api.post<IOrderResponse>("/order/", order);
+  createOrder(order: IOrder): Promise<IOrderResponse> {
+    return this.api.post<IOrderResponse>("/order", order);
   }
 }

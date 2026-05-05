@@ -8,10 +8,11 @@ export class Buyer {
   private email: string = "";
   private phone: string = "";
   private address: string = "";
+  public events: EventEmitter;
 
-  public events = new EventEmitter();
-
-  constructor() {}
+  constructor(events: EventEmitter) {
+    this.events = events;
+  }
 
   setData(data: Partial<IBuyer>): void {
     let changed = false;
@@ -38,7 +39,6 @@ export class Buyer {
 
     if (changed) {
       this.events.emit("buyer:changed", this.getBuyer());
-      this.events.emit("validation:changed", this.validate());
     }
   }
 
@@ -80,8 +80,6 @@ export class Buyer {
     this.phone = "";
     this.address = "";
 
-    this.events.emit("buyer:cleared");
     this.events.emit("buyer:changed", this.getBuyer());
-    this.events.emit("validation:changed", this.validate());
   }
 }

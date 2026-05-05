@@ -4,10 +4,10 @@ import { EventEmitter } from "../base/Events";
 export class ProductCatalog {
   private products: IProduct[];
   private selectedCard: IProduct | null;
+  public events: EventEmitter;
 
-  public events = new EventEmitter();
-
-  constructor() {
+  constructor(events: EventEmitter) {
+    this.events = events;
     this.products = [];
     this.selectedCard = null;
   }

@@ -4,7 +4,6 @@ import { ensureElement } from "../../../utils/utils";
 export abstract class Card<T> extends Component<T> {
   protected titleElement: HTMLElement;
   protected priceElement: HTMLElement;
-  protected idCard!: string;
 
   constructor(container: HTMLElement) {
     super(container);
@@ -27,9 +26,4 @@ export abstract class Card<T> extends Component<T> {
     this.priceElement.textContent =
       value === null ? `Бесценно` : `${value} синапсов`;
   }
-
-  set id(value: string) {
-    this.idCard = value;
-  }
 }
-

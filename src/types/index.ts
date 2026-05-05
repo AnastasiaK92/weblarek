@@ -42,3 +42,10 @@ export interface IOrderResponse {
   id: string;
   total: number;
 }
+
+export type BuyerUpdateData = {
+  payment?: "card" | "cash" | null;
+  address?: string;
+  email?: string;
+  phone?: string;
+};

@@ -3,11 +3,11 @@ import { EventEmitter } from "../base/Events";
 
 export class ShoppingCart {
   private products: IProduct[];
+  public events: EventEmitter;
 
-  public events = new EventEmitter();
-
-  constructor(products: IProduct[]) {
-    this.products = products;
+  constructor(events: EventEmitter) {
+    this.products = [];
+    this.events = events;
   }
 
   addProduct(product: IProduct): void {

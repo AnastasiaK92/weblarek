@@ -23,7 +23,7 @@ import { BuyerUpdateData } from "./types";
 
 const eventEmitter = new EventEmitter();
 const catalog = new ProductCatalog(eventEmitter);
-const cart = new ShoppingCart([]);
+const cart = new ShoppingCart(eventEmitter);
 const buyer = new Buyer(eventEmitter);
 const headerContainer = document.querySelector(".header") as HTMLElement;
 const catalogContainer = document.querySelector(".gallery") as HTMLElement;
@@ -73,10 +73,7 @@ cart.events.on("cart:changed", () => {
   });
   basket.list = basketItems;
   //считаем сумму
-  const total = cart.getProducts().reduce((sum, item) => {
-    return sum + (item.price ?? 0);
-  }, 0);
-  basket.total = total;
+  basket.total = cart.getTotalPrice();
 });
 
 eventEmitter.on("basket:remove", (item: IProduct) => {
@@ -148,21 +145,24 @@ eventEmitter.on("card:add", () => {
   }
   modal.close();
 });
-
+//клик
 eventEmitter.on("card:preview", (item: IProduct) => {
   catalog.setSelectedProduct(item);
-
+});
+//реакция на изменение модели
+eventEmitter.on("product:selected", (item: IProduct) => {
   preview.category = item.category;
   preview.title = item.title;
   preview.text = item.description;
   preview.price = item.price;
   preview.image = `${CDN_URL}${item.image}`;
   //состояние кнопки
+  const isInCart = cart.hasProduct(item.id);
+  preview.buttonDisabled = !item.price;
+
   if (!item.price) {
     preview.buttonText = "Недоступно";
-    preview.disableButton();
-  } else {
-    const isInCart = cart.hasProduct(item.id);
+  } else { 
     preview.buttonText = isInCart ? "Удалить из корзины" : "Купить";
   }
   modal.content = preview.render();
@@ -193,6 +193,7 @@ const orderTemplate = document.querySelector("#order") as HTMLTemplateElement;
 const contactsTemplate = document.querySelector(
   "#contacts",
 ) as HTMLTemplateElement;
+
 const order = new Order(cloneTemplate(orderTemplate), {
   onInput: (data) => {
     eventEmitter.emit("buyer:update", data);
@@ -204,7 +205,7 @@ const order = new Order(cloneTemplate(orderTemplate), {
 
 const contacts = new Contacts(cloneTemplate(contactsTemplate), {
   onInput: (data) => {
-    buyer.setData(data);
+   eventEmitter.emit("buyer:update", data);
   },
   onSubmit: () => {
     eventEmitter.emit("contacts:submit");
@@ -222,13 +223,14 @@ eventEmitter.on("order:submit", () => {
 //валидация формы
 buyer.events.on("buyer:changed", () => {
   if (!order || !contacts) return;
+
   const buyerData = buyer.getBuyer(); // получаем данные покупателя из модели
   const errors = buyer.validate(); // получаем результат валидации
   // далее через сеттеры форм обновляем значения в полях ввода, устанавливаем ошибки и управляем кнопками
   order.address = buyerData.address;
-  if (buyerData.payment === "cash" || buyerData.payment === "card") {
-    order.payment = buyerData.payment;
-  }
+ 
+  order.payment = buyerData.payment as "cash" | "card";
+  
   order.errors = [errors.address, errors.payment].filter(Boolean).join(", "); // устанавливаем ошибку на первой форме
   order.valid = !errors.address && !errors.payment; // управляем кнопкой отправки формы
   //контакты
@@ -277,12 +279,14 @@ eventEmitter.on("contacts:submit", () => {
 const successTemplate = document.querySelector(
   "#success",
 ) as HTMLTemplateElement;
-eventEmitter.on("order:success", (data: { total: number }) => {
-  const success = new Succes(cloneTemplate(successTemplate), {
+
+const success = new Succes(cloneTemplate(successTemplate), {
     onBasketClick: () => {
       modal.close();
     },
   });
+ 
+eventEmitter.on("order:success", (data: { total: number }) => {
   success.total = data.total;
   modal.content = success.render();
   modal.open();

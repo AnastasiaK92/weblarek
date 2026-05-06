@@ -64,7 +64,8 @@ export class CardPreview extends Card<CardPreviewData> {
     this.cardButton.textContent = value;
   }
 
-  disableButton() {
-    this.cardButton.disabled = true;
-  }
+ set buttonDisabled(isDisabled:boolean) {
+    this.cardButton.disabled = isDisabled;
+ }
+  
 }
